@@ -1,0 +1,50 @@
+﻿@page "/produtos"
+@* @attribute [StreamRendering(true)] *@
+
+<PageTitle>Produtos</PageTitle>
+
+<h3>Catálogo de Produtos Escolares</h3>
+
+@if (produtos == null)
+{
+    <p><em>Carregando...</em></p>
+}
+else if (produtos.Count == 0)
+{
+    <p><em>Problema em carregar o catálogo de produtos</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Preço (R$) </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var produto in produtos)
+            {
+                <tr>
+                    <!-- Simulando a carga de imagens de um host CDN -->
+                    <td><img height="80" width="80" src="@($"{baseUrl}{produto.ImagemUrl}")" /></td>
+                    <td>@produto.Nome</td>
+                    <td>@produto.Descricao</td>
+                    <td align="right">@produto.Preco.ToString("N2", new System.Globalization.CultureInfo("pt-BR"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Produto>? produtos;
+    private string baseUrl = "https://macoratti.net/imagens/catalogo/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        produtos = await _productService.GetProdutos();
+    }
+}

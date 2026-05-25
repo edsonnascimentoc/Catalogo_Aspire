@@ -44,9 +44,9 @@ public static class Extensions
         {
             var context = services.GetRequiredService<ProdutoDataContext>();
 
-            if (context.Database.CanConnect())
+            if (context.Database.EnsureCreated())
             {
-                context.Database.EnsureCreated();//usar so no desenvolvimento
+                //usar so no desenvolvimento
                 DbInitializer.Initialize(context);
             }
             else

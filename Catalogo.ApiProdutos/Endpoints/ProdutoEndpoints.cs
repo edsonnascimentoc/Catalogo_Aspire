@@ -1,5 +1,6 @@
 ﻿using Catalogo.ApiProdutos.Context;
 using Catalogo.Domain;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalogo.ApiProdutos.Endpoints;
@@ -16,7 +17,7 @@ public static class ProdutoEndpoints
             var produtos = await db.Produtos.ToListAsync();
             return produtos;
         })
-        .WithName("GetProdutos")
+        .WithName("GetProdutos")        
         .Produces<List<Produto>>(StatusCodes.Status200OK);
 
         group.MapGet("/{id}", async (int id, ProdutoDataContext db) =>
@@ -47,7 +48,8 @@ public static class ProdutoEndpoints
         })
         .WithName("UpdateProduto")
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status204NoContent);
+        .Produces(StatusCodes.Status204NoContent)
+        .RequireAuthorization();
 
         group.MapPost("/", async (Produto Produto, ProdutoDataContext db) =>
         {
@@ -56,7 +58,8 @@ public static class ProdutoEndpoints
             return Results.Created($"/api/Produto/{Produto.Id}", Produto);
         })
         .WithName("CreateProduto")
-        .Produces<Produto>(StatusCodes.Status201Created);
+        .Produces<Produto>(StatusCodes.Status201Created)
+        .RequireAuthorization();
 
         group.MapDelete("/{id}", async (int id, ProdutoDataContext db) =>
         {
@@ -68,6 +71,7 @@ public static class ProdutoEndpoints
         })
         .WithName("DeleteProduto")
         .Produces<Produto>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound);
+        .Produces(StatusCodes.Status404NotFound)
+        .RequireAuthorization();
     }
 }

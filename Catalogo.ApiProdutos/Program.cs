@@ -1,6 +1,7 @@
 using Catalogo.ApiProdutos.Context;
 using Catalogo.ApiProdutos.Endpoints;
-using Microsoft.EntityFrameworkCore;
+using Keycloak.AuthServices.Authentication;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.AddServiceDefaults();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
@@ -18,9 +20,17 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 
-// Add services to the container.
-builder.Services.AddDbContext<ProdutoDataContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddProblemDetails();
+builder.AddSqlServerDbContext<ProdutoDataContext>("sqldb");
+
+builder.Services.AddKeycloakWebApiAuthentication(
+    builder.Configuration, 
+    options =>
+    { options.Audience = builder.Configuration["Keycloak:ClientId"];
+      options.RequireHttpsMetadata = false;
+
+    }
+ );
 
 var app = builder.Build();
 
